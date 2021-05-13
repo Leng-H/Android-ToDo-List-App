@@ -4,15 +4,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.View;
 
 import com.example.todolist.Adapter.ToDoAdapter;
 import com.example.todolist.Model.ToDoModel;
+import com.example.todolist.Utils.DatabaseHandler;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DialogCloseListener {
 
     /**
      * RecyclerView = a container for UI
@@ -20,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView tasksRecyclerView;
     private ToDoAdapter taskAdapter;
     private List<ToDoModel> taskList;
+    private DatabaseHandler db;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
          * Define taskList
          */
         taskList = new ArrayList<>();
+        db = new DatabaseHandler(this);
+        db.openDatabase();
 
         tasksRecyclerView = findViewById(R.id.taskRecyclerView);
         tasksRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -38,33 +47,46 @@ public class MainActivity extends AppCompatActivity {
         /*
          * Set adapter to a recyclerview
          */
-        taskAdapter = new ToDoAdapter(this);
+        taskAdapter = new ToDoAdapter(db, this);
         tasksRecyclerView.setAdapter(taskAdapter);
 
-        /*
-         * Dummy Data
-         */
-        ToDoModel task = new ToDoModel();
-        task.setTask("Sample tasks ...");
-        task.setStatus(0);
-        task.setId(1);
+//        /*
+//         * Dummy Data
+//         */
+//        ToDoModel task = new ToDoModel();
+//        task.setTask("Sample tasks ...");
+//        task.setStatus(0);
+//        task.setId(1);
+//
+//        /*
+//         * Add task to the list
+//         */
+//        taskList.add(task);
+//        taskList.add(task);
+//
+//        /*
+//         * Update Recyclerview to show the dummy tasks above
+//         */
+//        taskAdapter.setTasks(taskList);
 
-        /*
-         * Add task to the list
-         */
-        taskList.add(task);
-        taskList.add(task);
-        taskList.add(task);
-        taskList.add(task);
-        taskList.add(task);
-        taskList.add(task);
-        taskList.add(task);
-        taskList.add(task);
-        taskList.add(task);
-
-        /*
-         * Update Recyclerview to show the dummy tasks above
-         */
+        taskList = db.getAllTasks();
+        Collections.reverse(taskList);
         taskAdapter.setTasks(taskList);
+
+        fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AddNewTask.newInstance().show(getSupportFragmentManager(), AddNewTask.TAG);
+            }
+        });
+    }
+
+    @Override
+    public void handleDialogClose(DialogInterface dialogInterface) {
+        taskList = db.getAllTasks();
+        Collections.reverse(taskList);
+        taskAdapter.setTasks(taskList);
+        taskAdapter.notifyDataSetChanged();
     }
 }
