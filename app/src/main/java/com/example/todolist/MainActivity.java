@@ -1,6 +1,7 @@
 package com.example.todolist;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -69,11 +70,15 @@ public class MainActivity extends AppCompatActivity implements DialogCloseListen
 //         */
 //        taskAdapter.setTasks(taskList);
 
+        fab = findViewById(R.id.fab);
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new RecyclerItemTouchHelper(taskAdapter));
+        itemTouchHelper.attachToRecyclerView(tasksRecyclerView);
+
         taskList = db.getAllTasks();
         Collections.reverse(taskList);
         taskAdapter.setTasks(taskList);
 
-        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
