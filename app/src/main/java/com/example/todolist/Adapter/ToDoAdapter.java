@@ -31,18 +31,34 @@ public class ToDoAdapter extends RecyclerView.Adapter<ToDoAdapter.ViewHolder> {
         this.mainActivity = mainActivity;
     }
 
+    /**
+     * RecyclerView calls onCreateViewHolder to create and initialize the ViewHolder
+     * @param parent
+     * @param viewType
+     * @return
+     */
+    @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.task_layout, parent, false);
         return new ViewHolder(itemView);
     }
 
+    /**
+     * RecyclerView calls onBindViewHolder to associate a ViewHolder with data.
+     * @param holder
+     * @param position
+     */
+    @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         ToDoModel item = todoList.get(position);
         holder.task.setText(item.getTask());
         holder.task.setChecked(toBoolean(item.getStatus()));
     }
 
+    /**
+     * @return size of the dataset
+     */
     @Override
     public int getItemCount() {
         return todoList.size();
